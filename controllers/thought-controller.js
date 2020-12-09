@@ -62,15 +62,15 @@ const ThoughtController = {
     },
 
     //add a new friend
-    addReaction({ params }, res) {
+    addReaction({ params, body }, res) {
         Thought.findOneAndUpdate(
-            { _id: params.thoughtId },
+            { _id: params.id },
             { $push: { reactions: body } },
             { new: true, runValidators: true }
         )
             .then(dbThoughtData => {
                 if (!dbThoughtData) {
-                    res.status(404).json({ message: 'No Thought found with this id, sorryyyy' });
+                    res.status(404).json({ message: 'No thought found with this id, sorryyyy' });
                     return;
                 }
                 res.json(dbThoughtData);
@@ -81,7 +81,7 @@ const ThoughtController = {
     //delete a friend
     deleteReaction({ params }, res) {
         Thought.findOneAndUpdate(
-            { _id: params.thoughtId },
+            { _id: params.id },
             { $pull: { reactions: { reactionId: params.reactionId } } },
             { new: true }
         )
