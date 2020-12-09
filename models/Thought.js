@@ -9,8 +9,9 @@ const ReactionSchema = new Schema(
             default: () => new Types.ObjectId()
         },
         reactionBody: {
-            type: String, 
-            required: true
+            type: String,
+            required: true,
+            minlength: 280
         },
         username: {
             type: String,
@@ -28,7 +29,8 @@ const ThoughtSchema = new Schema(
     {
         thoughtText: {
             type: String,
-            required: true
+            required: true,
+            length: [1, 280]
         },
         createdAt: {
             type: Date,
@@ -39,7 +41,7 @@ const ThoughtSchema = new Schema(
             type: String,
             required: true
         },
-        reactions: [ReactionSchema],
+        reactions: [ReactionSchema]
     },
     {
         toJSON: {
