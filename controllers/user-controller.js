@@ -1,4 +1,4 @@
-const { User } = require('../models');
+const { User, Thought } = require('../models');
 
 const UserController = {
     //functions will go in here as methods
@@ -82,7 +82,10 @@ const UserController = {
                     res.status(404).json({ message: 'No user found with this id.' });
                     return;
                 }
-                res.json(dbUserData);
+                return Thought.deleteMany({ _id: { $in: dbUserData.thoughts }})
+            })
+            .then( () => {
+                res.json( { message: 'We deleted this user and their associated thoughts.'});
             })
             .catch(err => res.status(400).json(err));
     },
@@ -90,13 +93,13 @@ const UserController = {
     //add a new friend
     addNewFriend({ params }, res) {
         User.findOneAndUpdate(
-            { _id: params.friendId },
-            { $push: { friends: body } },
+            { _id: params.id },
+            { $push: { friends: params.friendId } },
             { new: true, runValidators: true }
         )
             .then(dbUserData => {
                 if (!dbUserData) {
-                    res.status(404).json({ message: 'No user found with this id, sorryyyy' });
+                    res.status(404).json({ message: 'No user found with this id, sorry' });
                     return;
                 }
                 res.json(dbUserData);
@@ -107,8 +110,8 @@ const UserController = {
     //delete a friend
     deleteFriend({ params }, res) {
         User.findOneAndUpdate(
-            { _id: params.userId },
-            { $pull: { friends: { friendId: params.friendId } } },
+            { _id: params.id },
+            { $pull: { friends: params.friendId } },
             { new: true }
         )
             .then(dbUserData => res.json(dbUserData))
