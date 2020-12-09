@@ -30,9 +30,28 @@ const ThoughtController = {
 
     //create a new thought
     createThought({ body }, res) {
-        Thought.create(body)
+        Thought.create(
+            { $push: { users: body } },
+            { new: true }
+        )
             .then(dbThoughtData => res.json(dbThoughtData))
             .catch(err => res.status(400).json(err));
+    },
+
+    addReaction({ params, body }, res) {
+        Thought.findOneAndUpdate(
+            { _id: params.id },
+            { $push: { reactions: body } },
+            { new: true, runValidators: true }
+        )
+            .then(dbThoughtData => {
+                if (!dbThoughtData) {
+                    res.status(404).json({ message: 'No thought found with this id, sorryyyy' });
+                    return;
+                }
+                res.json(dbThoughtData);
+            })
+            .catch(err => res.json(err));
     },
 
     //update an existing Thought (by its id)
